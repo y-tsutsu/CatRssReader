@@ -9,7 +9,8 @@
     xmlns:common="using:CatRssReader.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    NavigationCacheMode="Required">
 
     <Page.Resources>
         <!-- セクション 4 に表示される、グリッドに適した 310x260 ピクセルのアイテム テンプレート -->
@@ -117,7 +118,7 @@
                 </HubSection.Header>
                 <DataTemplate>
                     <ListView Width="500">
-                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                        <ListViewItem Background="DodgerBlue" Tapped="ListViewItem_Tapped" Margin="0,0,0,10" BorderThickness="15,10">
                             <StackPanel>
                                 <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
                                     記事タイトルその1 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・

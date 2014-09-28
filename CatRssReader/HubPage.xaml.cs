@@ -116,5 +116,15 @@ namespace CatRssReader
         }
 
         #endregion
+
+        /// <summary>
+        /// 見出しタイトルのタップイベント
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ListViewItem_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(ViewPage));
+        }
     }
 }
