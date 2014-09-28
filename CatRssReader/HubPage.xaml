@@ -1,0 +1,293 @@
+﻿<Page
+    x:Name="pageRoot"
+    x:Class="CatRssReader.HubPage"
+    DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CatRssReader"
+    xmlns:data="using:CatRssReader.Data"
+    xmlns:common="using:CatRssReader.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <!-- セクション 4 に表示される、グリッドに適した 310x260 ピクセルのアイテム テンプレート -->
+        <DataTemplate x:Key="Standard310x260ItemTemplate">
+            <Grid Height="250" Width="310" Margin="5,10,5,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}" Height="150">
+                    <Image Source="{Binding ImagePath}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}"/>
+                </Border>
+                <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                    <TextBlock Text="{Binding Title}" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
+                    <TextBlock Text="{Binding Description}" Style="{StaticResource BodyTextBlockStyle}" MaxHeight="60" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <!--
+    このグリッドはページのルート パネルとして機能します。
+  -->
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+        <Hub SectionHeaderClick="Hub_SectionHeaderClick">
+            <Hub.Header>
+                <!-- [戻る] ボタンおよびページ タイトル-->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button  x:Name="backButton" Style="{StaticResource NavigationBackButtonNormalStyle}"
+                        Margin="-1,-1,39,0" 
+                        VerticalAlignment="Top"
+                        Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+                        AutomationProperties.Name="Back"
+                        AutomationProperties.AutomationId="BackButton"
+                        AutomationProperties.ItemType="Navigation Button"/>
+                    <TextBlock x:Name="pageTitle" Text="{StaticResource AppName}" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+                        VerticalAlignment="Top" IsHitTestVisible="false" TextWrapping="NoWrap" />
+                </Grid>
+            </Hub.Header>
+            <HubSection Width="660" Padding="120,35,0,68" Margin="0,0,80,0">
+                <HubSection.Background>
+                    <ImageBrush ImageSource="Assets/cat.jpg" Stretch="UniformToFill" />
+                </HubSection.Background>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" /><!--1行目は残りのスペース全部-->
+                            <RowDefinition Height="Auto" /><!--2行目はコンテンツの高さに従う-->
+                        </Grid.RowDefinitions>
+                        
+                        <Rectangle Width="0" Height="5000" /><!--1行目の高さを最大にするため，最初のセルにダミーを置く-->
+                        
+                        <!--ここに目次を作り込む-->
+                        <ListView Background="Transparent" Width="500">
+                            <ListView.Resources>
+                                <Style TargetType="ListViewItem" x:Key="IndexItemStyle1">
+                                    <Setter Property="FontSize" Value="30" />
+                                    <Setter Property="Background" Value="#88FFFFFF" />
+                                    <Setter Property="Margin" Value="0,0,0,10" />
+                                    <Setter Property="BorderThickness" Value="15,10" />
+                                </Style>
+                            </ListView.Resources>
+                            <ListViewItem Content="Insider .NET フォーラム"
+                                          Style="{StaticResource IndexItemStyle1}" />
+                            <ListViewItem Content="NEWS 最新記事一覧"
+                                          Style="{StaticResource IndexItemStyle1}" />
+                            <ListViewItem Content="お気に入り"
+                                          Style="{StaticResource IndexItemStyle1}" />
+                        </ListView>
+                        
+                        <!--説明-->
+                        <Border Grid.Row="1" Background="#88FFFFFF" Width="500" Padding="10,5">
+                            <RichTextBlock FontSize="15">
+                                <Paragraph FontWeight="Bold">
+                                    ネコのRSSフィードを読むツールです．
+                                </Paragraph>
+                                <Paragraph>
+                                    記事のタイトルのタイルをタップすると，記事が読めます．
+                                    <LineBreak />
+                                    記事の愛とるの上のセクション・ヘッダをタップすると，そのセクションの記事リストに切り替わります．
+                                    <LineBreak />
+                                    「お気に入り」への登録は，記事タイトルのタイルを長押し（右クリック）します．
+                                </Paragraph>
+                                <Paragraph FontSize="12" Margin="0,10" TextAlignment="Right">
+                                    Copyright © 2013 tsutsu
+                                </Paragraph>
+                            </RichTextBlock>
+                        </Border>
+                        
+                    </Grid>
+                </DataTemplate>
+            </HubSection>
+            <HubSection Padding="0,35,80,68" IsHeaderInteractive="True">
+                <HubSection.Header>
+                    <TextBlock Text="Insider .NET フォーラム" />
+                </HubSection.Header>
+                <DataTemplate>
+                    <ListView Width="500">
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその1 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその2 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその3 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその4 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその5 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                    </ListView>
+                </DataTemplate>
+            </HubSection>
+            <HubSection Padding="0,35,80,68" IsHeaderInteractive="True">
+                <HubSection.Header>
+                    <TextBlock Text="NEWS 最新記事一覧" />
+                </HubSection.Header>
+                <DataTemplate>
+                    <ListView Width="500">
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその1 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその2 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその3 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその4 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="DodgerBlue" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその5 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                    </ListView>
+                </DataTemplate>
+            </HubSection>
+            <HubSection Padding="0,35,80,68" IsHeaderInteractive="True">
+                <HubSection.Header>
+                    <TextBlock Text="お気に入り" />
+                </HubSection.Header>
+                <DataTemplate>
+                    <ListView Width="500">
+                        <ListViewItem Background="BlueViolet" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその1 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="BlueViolet" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその2 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="BlueViolet" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその3 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="BlueViolet" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその4 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                        <ListViewItem Background="BlueViolet" Margin="0,0,0,10" BorderThickness="15,10">
+                            <StackPanel>
+                                <TextBlock Foreground="White" FontSize="24" TextWrapping="Wrap">
+                                    記事タイトルその5 ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・ ・
+                                </TextBlock>
+                                <TextBlock Foreground="White" FontSize="12">
+                                    20XX/XX/XX
+                                </TextBlock>
+                            </StackPanel>
+                        </ListViewItem>
+                    </ListView>
+                </DataTemplate>
+            </HubSection>
+        </Hub>
+    </Grid>
+</Page>
